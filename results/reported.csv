@@ -1,0 +1,35 @@
+family,model,input,classes,split,acc,time_s,source
+LR,logreg,raw,3,dev,79.51,25,Table 1 p.3
+LR,logreg,raw,10,dev,64.64,122,Table 1 p.3
+LR,logreg,raw,50,dev,43.89,1089,Table 1 p.3
+SVM,linear,scaled,3,dev,40.8,204,Table 2 p.4
+SVM,linear,scaled,10,dev,22.22,1831,Table 2 p.4
+SVM,rbf,scaled,3,dev,62.68,317,Table 2 p.4
+SVM,rbf,scaled,10,dev,61.01,2842,Table 2 p.4
+SVM,poly,scaled,3,dev,51.7,448,Table 2 p.4
+SVM,poly,scaled,10,dev,50.89,6673,Table 2 p.4
+SVM,sigmoid,scaled,3,dev,33.08,478,Table 2 p.4
+SVM,sigmoid,scaled,10,dev,11.72,6971,Table 2 p.4
+CNN,V1,raw,3,dev,91.43,225,Table 3 p.4
+CNN,V1,raw,10,dev,89.34,619,Table 3 p.4
+CNN,V1,raw,50,dev,81.79,2808,Table 3 p.4
+CNN,V2,raw,3,dev,91.33,230,Table 3 p.4
+CNN,V2,raw,10,dev,89.22,622,Table 3 p.4
+CNN,V2,raw,50,dev,81.83,2808,Table 3 p.4
+CNN,V2,raw,50,test,81.87,,p.5
+CNN,V1,binarized,3,dev,89.02,220,Table 4 p.4
+CNN,V1,binarized,10,dev,87.22,590,Table 4 p.4
+CNN,V1,binarized,50,dev,77.46,2685,Table 4 p.4
+CNN,V2,binarized,3,dev,89.12,215,Table 4 p.4
+CNN,V2,binarized,10,dev,86.67,585,Table 4 p.4
+CNN,V2,binarized,50,dev,77.38,2715,Table 4 p.4
+CNN,V3,binarized,3,dev,88.2,186,Table 4 p.4
+CNN,V3,binarized,10,dev,86.6,560,Table 4 p.4
+CNN,V3,binarized,50,dev,70.3,2455,Table 4 p.4
+CNN,V4,binarized,3,dev,89.1,239,Table 4 p.4
+CNN,V4,binarized,10,dev,85.6,628,Table 4 p.4
+CNN,V4,binarized,50,dev,70.3,3043,Table 4 p.4
+TL,vgg19,resized,3,dev,95.58,207,Tables 5-6 p.5 (s per epoch)
+TL,mobilenet,resized,3,dev,75.4,103,Tables 5-6 p.5 (s per epoch)
+TL,resnet50,resized,3,dev,62.72,152,Tables 5-6 p.5 (s per epoch)
+TL,inception,resized,3,dev,45.72,540,Tables 5-6 p.5 (s per epoch)
