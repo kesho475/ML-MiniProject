@@ -1,0 +1,11 @@
+data/
+results/models/
+.venv/
+__pycache__/
+*.ubj
+*.h5
+*.keras
+**/ckpt/
+results/xgb_extended-smoke/
+graphify-out/
+.claude/
