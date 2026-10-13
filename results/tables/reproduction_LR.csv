@@ -1,0 +1,4 @@
+family,model,input,classes,split,rep_acc,our_acc,diff,rep_time,our_fit,our_total,likely_cause,time_note
+LR,logreg,raw,3,dev,79.51,79.27,-0.24,25.0,19.92,20.26,,fit only
+LR,logreg,raw,10,dev,64.64,65.79,1.15,122.0,20.02,20.46,,fit only
+LR,logreg,raw,50,dev,43.89,43.31,-0.58,1089.0,85.98,87.04,,fit only

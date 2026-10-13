@@ -1,0 +1,37 @@
+family,model,input,classes,dev_acc,test_acc,fit_time_s,extract_time_s,time_s,total_time_s,xgb_source,run_id
+LR,logreg,raw,3,79.27,78.58,19.92,,19.92,20.26,,LR_logreg_3_raw_s0
+LR,logreg,raw,10,65.79,66.63,20.02,,20.02,20.46,,LR_logreg_10_raw_s0
+LR,logreg,raw,50,43.31,43.26,85.98,,85.98,87.04,,LR_logreg_50_raw_s0
+SVM,linear,scaled,3,43.28,,38.02,,38.02,43.08,,SVM_linear_3_scaled_s0
+SVM,poly,scaled,3,66.73,,37.7,,37.7,41.2,,SVM_poly_3_scaled_s0
+SVM,rbf,scaled,3,84.0,,41.36,,41.36,45.02,,SVM_rbf_3_scaled_s0
+SVM,sigmoid,scaled,3,32.47,,43.41,,43.41,47.76,,SVM_sigmoid_3_scaled_s0
+SVM,linear,scaled,10,23.35,,562.75,,562.75,799.76,,SVM_linear_10_scaled_s0
+SVM,poly,scaled,10,73.88,,606.69,,606.69,797.54,,SVM_poly_10_scaled_s0
+SVM,rbf,scaled,10,74.62,,655.3,,655.3,709.72,,SVM_rbf_10_scaled_s0
+SVM,sigmoid,scaled,10,13.44,,691.11,,691.11,837.1,,SVM_sigmoid_10_scaled_s0
+CNN,V1,binarized,3,89.57,,43.66,,43.66,45.09,,CNN_V1_3_binarized_s7
+CNN,V1,raw,3,90.75,,39.35,,39.35,40.67,,CNN_V1_3_raw_s7
+CNN,V2,binarized,3,90.07,,38.53,,38.53,39.89,,CNN_V2_3_binarized_s7
+CNN,V2,raw,3,91.72,,37.7,,37.7,38.91,,CNN_V2_3_raw_s7
+CNN,V3,binarized,3,88.75,,37.47,,37.47,38.75,,CNN_V3_3_binarized_s7
+CNN,V4,binarized,3,89.2,,36.9,,36.9,38.23,,CNN_V4_3_binarized_s7
+CNN,V1,binarized,10,86.56,,109.33,,109.33,111.4,,CNN_V1_10_binarized_s7
+CNN,V1,raw,10,88.77,,109.21,,109.21,110.79,,CNN_V1_10_raw_s7
+CNN,V2,binarized,10,85.06,,100.02,,100.02,101.88,,CNN_V2_10_binarized_s7
+CNN,V2,raw,10,88.5,,99.14,,99.14,100.47,,CNN_V2_10_raw_s7
+CNN,V3,binarized,10,84.12,,91.7,,91.7,93.74,,CNN_V3_10_binarized_s7
+CNN,V4,binarized,10,84.73,,86.62,,86.62,88.21,,CNN_V4_10_binarized_s7
+CNN,V1,binarized,50,76.83,,423.66,,423.66,427.98,,CNN_V1_50_binarized_s7
+CNN,V1,raw,50,81.21,,431.43,,431.43,433.31,,CNN_V1_50_raw_s7
+CNN,V2,binarized,50,70.43,,374.83,,374.83,378.23,,CNN_V2_50_binarized_s7
+CNN,V2,raw,50,75.13,75.13,372.88,,372.88,374.98,,CNN_V2_50_raw_s7
+CNN,V3,binarized,50,65.14,,319.7,,319.7,323.23,,CNN_V3_50_binarized_s7
+CNN,V4,binarized,50,70.45,,361.36,,361.36,364.71,,CNN_V4_50_binarized_s7
+TL,inception,resized,3,93.05,92.67,1210.27,140.7,1350.97,1219.02,,TL_inception_3_resized_s7
+TL,mobilenet,resized,3,94.58,93.85,82.28,41.7,123.98,83.48,,TL_mobilenet_3_resized_s7
+TL,resnet50,resized,3,95.35,95.22,84.13,85.7,169.83,85.61,,TL_resnet50_3_resized_s7
+TL,vgg19,resized,3,95.35,94.8,17.04,189.8,206.84,18.12,,TL_vgg19_3_resized_s7
+XGB,xgb,raw,3,91.65,90.8,56.76,,56.76,1532.56,Phase 8 (kept),XGB_xgb_3_raw_s0
+XGB,xgb_extended,raw,10,89.84,89.79,485.8,,485.8,,Phase 8B,XGB_xgb_extended_10_raw_s0
+XGB,xgb_extended,raw,50,77.95,77.89,7191.1,,7191.1,,Phase 8B,XGB_xgb_extended_50_raw_s0
