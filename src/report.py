@@ -9,6 +9,7 @@ Smoke-test runs (model names ending in -smoke) are left out of every table and c
 """
 import json
 import os
+from decimal import ROUND_HALF_UP, Decimal
 import shutil
 
 import matplotlib
@@ -52,6 +53,11 @@ TIME_NOTE = {
     "LR": "fit only", "SVM": "fit only", "CNN": "fit only (reported time starts before data loading, Q5)",
     "TL": "reported: s per epoch, full network; ours: head-only s in total, see cross-model table",
 }
+
+
+def f1(x):
+    """One decimal, half-up from the CSV value (95.35 -> 95.4), same as the slides."""
+    return str(Decimal(repr(float(x))).quantize(Decimal("0.1"), rounding=ROUND_HALF_UP))
 
 
 def no_smoke(df, col="model"):
@@ -127,28 +133,29 @@ def acc_vs_time(cm):
                              facecolor=SURFACE)
     for ax, k in zip(axes, sizes):
         _style(ax)
+        ax.tick_params(labelsize=11)  # read from a slide, so larger than the other charts
         for fam, (col, mk) in FAMILY_STYLE.items():
             d = cm[(cm.classes == k) & (cm.family == fam)]
             if len(d):
-                ax.scatter(d.time_s, d.dev_acc, s=46, color=col, marker=mk, edgecolors=SURFACE,
+                ax.scatter(d.time_s, d.dev_acc, s=80, color=col, marker=mk, edgecolors=SURFACE,
                            linewidths=1.5, label=FAMILY_NAME[fam], zorder=3)
         best = cm[cm.classes == k].nlargest(1, "dev_acc").iloc[0]
-        ax.annotate(f"{best.model} {best.dev_acc:.1f}", (best.time_s, best.dev_acc), xytext=(6, -12),
-                    textcoords="offset points", fontsize=7, color=INK)
+        ax.annotate(f"{best.model} {f1(best.dev_acc)}", (best.time_s, best.dev_acc), xytext=(6, -12),
+                    textcoords="offset points", fontsize=11, color=INK)
         ax.set_xscale("log")
-        ax.set_title(f"{k} classes", fontsize=10, color=INK, loc="left")
-        ax.set_xlabel("training time, s (log scale)", fontsize=8, color=INK2)
-    axes[0].set_ylabel("dev accuracy, %", fontsize=8, color=INK2)
+        ax.set_title(f"{k} classes", fontsize=14, color=INK, loc="left")
+        ax.set_xlabel("training time, s (log scale)", fontsize=12, color=INK2)
+    axes[0].set_ylabel("dev accuracy, %", fontsize=12, color=INK2)
     seen = {}
     for ax in axes:  # not every family exists at every class size (TL: 3 classes only)
         for h, l in zip(*ax.get_legend_handles_labels()):
             seen.setdefault(l, h)
     l = [FAMILY_NAME[f] for f in FAMILY_STYLE]
     h = [seen[x] for x in l]
-    fig.legend(h, l, loc="upper center", ncol=5, frameon=False, fontsize=8, labelcolor=INK,
-               bbox_to_anchor=(0.5, 1.06))
-    fig.text(0.0, -0.04, "Our runs only, one point per model, input and class size. TL time = feature extraction "
-             "+ head training; XGBoost = final model (Phase 8B at 10/50 classes).", fontsize=7, color=INK2)
+    fig.legend(h, l, loc="upper center", ncol=5, frameon=False, fontsize=12, labelcolor=INK,
+               bbox_to_anchor=(0.5, 1.1))
+    fig.text(0.0, -0.09, "Our runs only, one point per model, input and class size. TL time = feature extraction "
+             "+ head training; XGBoost = final model (Phase 8B at 10/50 classes).", fontsize=10, color=INK2)
     _save(fig, "accuracy_vs_time.png")
 
 
@@ -190,8 +197,8 @@ def tl_batchnorm(rep):
     for i, r in enumerate(d.itertuples()):
         if TL_BATCHNORM[r.model]:  # texture marks the BatchNorm networks, not colour alone
             ax.bar(i + 0.2, r.our_acc, 0.38, color="none", edgecolor=SURFACE, hatch="///", linewidth=0)
-        ax.text(i + 0.2, r.our_acc + 1.5, f"{r.our_acc:.1f}", ha="center", fontsize=7, color=INK)
-        ax.text(i - 0.2, r.rep_acc + 1.5, f"{r.rep_acc:.1f}", ha="center", fontsize=7, color=INK2)
+        ax.text(i + 0.2, r.our_acc + 1.5, f1(r.our_acc), ha="center", fontsize=7, color=INK)
+        ax.text(i - 0.2, r.rep_acc + 1.5, f1(r.rep_acc), ha="center", fontsize=7, color=INK2)
     ax.set_ylabel("dev accuracy, %", fontsize=8, color=INK2)
     ax.legend(frameon=False, fontsize=8, loc="lower left")
     fig.text(0.0, -0.06, "Hatched = network with BatchNorm. Q7: frozen BatchNorm runs in inference mode in TF2 "
