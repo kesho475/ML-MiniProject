@@ -1,13 +1,12 @@
-"""Shared experiment harness: every run, any model, writes the same outputs.
+"""Shared run bookkeeping for every model: seeding, fit timing, accuracy and result saving.
 
-    with Run("LR", "logreg", 3, "raw", params, hardware="CPU") as r:
+    with Run("LR", "logreg", 3, "raw", params) as r:
         with r.fit_timer():
             clf.fit(...)
         r.finish(y_dev, pred_dev, class_names, y_test=y_test, pred_test=pred_test)
 
-Outputs: results/runs/<id>.json, a row in results/all_results.csv, confusion
-matrix (.npy + normalized .png) in results/figures/<id>/, logs/<id>.log.
-CNN / transfer learning also get history_csv(), curve_png() and checkpoint_cb().
+Each run writes runs/<id>.json, one row of all_results.csv, a confusion matrix in figures/<id>/ and
+logs/<id>.log. The output folder is results/ unless a script is given --out.
 """
 import csv
 import fcntl
@@ -23,25 +22,36 @@ from importlib.metadata import version
 import numpy as np
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-RUNS = os.path.join(ROOT, "results", "runs")
-FIGS = os.path.join(ROOT, "results", "figures")
-MODELS = os.path.join(ROOT, "results", "models")
-LOGS = os.path.join(ROOT, "logs")
-ALL_CSV = os.path.join(ROOT, "results", "all_results.csv")
-ACTIVE = os.path.join(RUNS, "active")  # one marker file per running run
 COLS = ["run_id", "family", "model", "classes", "input", "params", "fit_time_s", "total_time_s",
         "dev_acc", "test_acc", "hardware", "versions", "seed", "date", "concurrent"]
 LIBS = ("numpy", "scikit-learn", "tensorflow", "keras", "xgboost")
+OUT = os.path.join(ROOT, "results")
+LOGS = os.path.join(ROOT, "logs")
+
+
+def set_out(path):
+    """Send every output of this process to `path` (results/ by default)."""
+    global OUT, LOGS
+    if path:
+        OUT, LOGS = os.path.abspath(path), os.path.join(os.path.abspath(path), "logs")
+
+
+def add_out_arg(ap):
+    ap.add_argument("--out", help="output folder instead of results/ (e.g. for a quick test)")
+
+
+def out(*parts):
+    return os.path.join(OUT, *parts)
 
 
 def _versions():
-    out = {}
+    v = {}
     for lib in LIBS:
         try:
-            out[lib] = version(lib)
+            v[lib] = version(lib)
         except Exception:
             pass
-    return out
+    return v
 
 
 def seed_all(seed):
@@ -74,9 +84,10 @@ class Run:
         self.params, self.hardware, self.seed = params or {}, hardware, seed
         self.id = f"{family}_{model}_{k}_{variant}_s{seed}".replace(" ", "")
         self.fit_time = 0.0
-        self.fig_dir = os.path.join(FIGS, self.id)
-        self.ckpt_dir = os.path.join(MODELS, self.id)
-        for d in (RUNS, ACTIVE, self.fig_dir, LOGS):
+        self.fig_dir = out("figures", self.id)
+        self.ckpt_dir = out("models", self.id)
+        self.active = out("runs", "active")  # one marker file per running run
+        for d in (out("runs"), self.active, self.fig_dir, LOGS):
             os.makedirs(d, exist_ok=True)
 
     def __enter__(self):
@@ -84,14 +95,14 @@ class Run:
         self._log = open(os.path.join(LOGS, self.id + ".log"), "a")
         self._stdout = sys.stdout
         sys.stdout = _Tee(self._stdout, self._log)
-        self.concurrent = sorted(f[:-7] for f in os.listdir(ACTIVE))  # runs already going
-        open(os.path.join(ACTIVE, self.id + ".active"), "w").close()
+        self.concurrent = sorted(f[:-7] for f in os.listdir(self.active))
+        open(os.path.join(self.active, self.id + ".active"), "w").close()
         print(f"[{self.id}] start {datetime.now():%F %T} concurrent={self.concurrent}")
         seed_all(self.seed)
         return self
 
     def __exit__(self, *exc):
-        marker = os.path.join(ACTIVE, self.id + ".active")
+        marker = os.path.join(self.active, self.id + ".active")
         if os.path.exists(marker):
             os.remove(marker)
         sys.stdout = self._stdout
@@ -99,13 +110,13 @@ class Run:
 
     @contextmanager
     def fit_timer(self):
-        """Time the training call only (fit_time_s). Can be used more than once (e.g. 2 stages)."""
+        """Time the training call only (fit_time_s); can be used more than once."""
         t = time.time()
         yield
         self.fit_time += time.time() - t
 
     def finish(self, y_dev, pred_dev, class_names, y_test=None, pred_test=None):
-        """Save confusion matrix, JSON and CSV row. Returns the result dict."""
+        """Save the confusion matrix, run JSON and CSV row; return the result dict."""
         dev_acc = float(np.mean(y_dev == pred_dev))
         test_acc = None if y_test is None else float(np.mean(y_test == pred_test))
         self._confusion(y_dev, pred_dev, class_names)
@@ -116,7 +127,7 @@ class Run:
                    test_acc=None if test_acc is None else round(100 * test_acc, 2),
                    hardware=self.hardware, versions=_versions(), seed=self.seed,
                    date=datetime.now().isoformat(timespec="seconds"), concurrent=self.concurrent)
-        with open(os.path.join(RUNS, self.id + ".json"), "w") as f:
+        with open(out("runs", self.id + ".json"), "w") as f:
             json.dump(res, f, indent=1)
         self._append_csv(res)
         print(f"[{self.id}] dev_acc={res['dev_acc']} test_acc={res['test_acc']} "
@@ -125,7 +136,7 @@ class Run:
 
     def _append_csv(self, res):
         row = {c: json.dumps(res[c]) if isinstance(res[c], (dict, list)) else res[c] for c in COLS}
-        with open(ALL_CSV, "a", newline="") as f:
+        with open(out("all_results.csv"), "a", newline="") as f:
             fcntl.flock(f, fcntl.LOCK_EX)  # parallel runs share this file
             w = csv.DictWriter(f, COLS)
             if f.tell() == 0:
@@ -140,7 +151,7 @@ class Run:
         cm = np.zeros((k, k), dtype=np.int64)
         np.add.at(cm, (y, pred), 1)
         np.save(os.path.join(self.fig_dir, "confusion_dev.npy"), cm)
-        n = min(k, 10)  # like the report's Fig. 8: first 10 classes of a big matrix
+        n = min(k, 10)  # plot the first 10 classes of a large matrix
         norm = (cm / cm.sum(axis=1, keepdims=True))[:n, :n]
         fig, ax = plt.subplots(figsize=(6, 5))
         im = ax.imshow(norm, cmap="Blues", vmin=0, vmax=1)
@@ -154,9 +165,8 @@ class Run:
         fig.savefig(os.path.join(self.fig_dir, "confusion_dev.png"), dpi=120)
         plt.close(fig)
 
-    # --- CNN / transfer learning helpers ---------------------------------
+    # Keras helpers (CNN and transfer learning)
     def history_csv(self, history):
-        """Save a Keras History as a per-epoch CSV (train/dev loss and accuracy)."""
         h = history.history if hasattr(history, "history") else history
         keys = list(h)
         with open(os.path.join(self.fig_dir, "history.csv"), "w", newline="") as f:
@@ -166,7 +176,6 @@ class Run:
                 w.writerow([i + 1] + [h[k][i] for k in keys])
 
     def curve_png(self, history):
-        """Training curve (loss and accuracy, train vs dev), like the report's Fig. 9."""
         import matplotlib
         matplotlib.use("Agg")
         import matplotlib.pyplot as plt
@@ -183,28 +192,6 @@ class Run:
         plt.close(fig)
 
     def checkpoint_cb(self):
-        """Keras callback: state saved every epoch (more often than the 10 the plan asks);
-        a rerun with the same run id resumes fit() from the last saved epoch."""
+        """Keras callback that saves state every epoch; rerunning the same run resumes from it."""
         import keras
         return keras.callbacks.BackupAndRestore(self.ckpt_dir, delete_checkpoint=False)
-
-
-def _demo():
-    """Dummy run: LR on 3 classes, max_iter=5. Writes JSON, CSV row, confusion PNG and log."""
-    from sklearn.linear_model import LogisticRegression
-    from data import load
-    with Run("LR", "logreg", 3, "raw", {"max_iter": 5}, seed=0) as r:
-        xtr, ytr, xdv, ydv, xte, yte, names = load(3, "raw")
-        clf = LogisticRegression(max_iter=5, random_state=0)
-        with r.fit_timer():
-            clf.fit(xtr, ytr)
-        res = r.finish(ydv, clf.predict(xdv), names, yte, clf.predict(xte))
-    assert os.path.exists(os.path.join(RUNS, r.id + ".json"))
-    assert os.path.exists(os.path.join(r.fig_dir, "confusion_dev.png"))
-    assert os.path.exists(os.path.join(LOGS, r.id + ".log"))
-    assert 30 < res["dev_acc"] <= 100
-    print("harness demo OK")
-
-
-if __name__ == "__main__":
-    _demo()
