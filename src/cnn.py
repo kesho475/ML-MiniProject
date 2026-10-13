@@ -2,7 +2,7 @@
 Usage: python src/cnn.py <V1..V4> <raw|binarized> <k> [seed=7] [--epochs N] [--smoke]
 
 Spec: raw 0-255 input (no normalization), Adam default, cross-entropy, batch 500, 100 epochs.
-Exit code 3 = collapse: dev accuracy still at chance after 5 epochs (Q3); the launcher reruns with seed+1.
+Exit code 3 = collapse: dev accuracy still at chance after 5 epochs; the launcher reruns with seed+1.
 --smoke: model name gets "-smoke" so it never counts as a real result.
 """
 import os

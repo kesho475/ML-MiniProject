@@ -1,5 +1,5 @@
-family,model,input,classes,split,rep_acc,our_acc,diff,rep_time,our_fit,our_total,likely_cause,time_note
-TL,vgg19,resized,3,dev,95.58,95.35,-0.23,207.0,17.04,18.12,,"reported: s per epoch, full network; ours: head-only s in total, see cross-model table"
-TL,mobilenet,resized,3,dev,75.4,94.58,19.18,103.0,82.28,83.48,"Q7: frozen BatchNorm runs in inference mode in TF2, in training mode in 2018 Keras","reported: s per epoch, full network; ours: head-only s in total, see cross-model table"
-TL,resnet50,resized,3,dev,62.72,95.35,32.63,152.0,84.13,85.61,"Q7: frozen BatchNorm runs in inference mode in TF2, in training mode in 2018 Keras","reported: s per epoch, full network; ours: head-only s in total, see cross-model table"
-TL,inception,resized,3,dev,45.72,93.05,47.33,540.0,1210.27,1219.02,"Q7: frozen BatchNorm runs in inference mode in TF2, in training mode in 2018 Keras","reported: s per epoch, full network; ours: head-only s in total, see cross-model table"
+Model,Input,Classes,Reported accuracy (%),Our accuracy (%),Difference (points),Reported training time (s),Our training time (s),Explanation
+VGG19,resized,3,95.6,95.4,-0.2,207,207,Reproduced: within 1 point. Reported time is seconds per epoch for the full network; ours is feature extraction plus head training in total
+MobileNet,resized,3,75.4,94.6,19.2,103,124,"Frozen BatchNorm behaved differently in 2018 Keras, which lowered their scores. Reported time is seconds per epoch for the full network; ours is feature extraction plus head training in total"
+ResNet50,resized,3,62.7,95.4,32.6,152,170,"Frozen BatchNorm behaved differently in 2018 Keras, which lowered their scores. Reported time is seconds per epoch for the full network; ours is feature extraction plus head training in total"
+InceptionV3,resized,3,45.7,93.1,47.3,540,1351,"Frozen BatchNorm behaved differently in 2018 Keras, which lowered their scores. Reported time is seconds per epoch for the full network; ours is feature extraction plus head training in total"

@@ -1,4 +1,4 @@
-# Class sets from the reference's download scripts (PLAN.md "Class sets").
+# Class sets from the reference's download scripts.
 CLASSES_3 = ["eraser", "belt", "banana"]
 CLASSES_10 = ["laptop", "rain", "hockey stick", "wristwatch", "nose", "pond",
               "The Mona Lisa", "banana", "panda", "paint can"]

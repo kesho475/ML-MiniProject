@@ -15,3 +15,9 @@ logs/
 results/runs/
 results/xgb_phase8_backup/
 *smoke*
+PROGRESS.md
+CLAUDE.md
+results/xgb_extended/
+results/optuna/
+results/figures/*/
+/33*.pdf

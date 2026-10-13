@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# Optional svm70k queue (CPU, Q4 check): same 8 SVM runs on the first 70,000 drawings per class.
+# Optional svm70k queue (CPU, data-size check): same 8 SVM runs on the first 70,000 drawings per class.
 # Extra rows with family "svm70k"; the main 20k SVM results are untouched.
 # RAM: measured peak RSS ~2.3 GB per 3-class job and ~7.5 GB per 10-class job, so 4 at a time
 # for 3 classes and 2 at a time for 10 classes (<= ~15 GB, leaving room for XGBoost on 50 classes).

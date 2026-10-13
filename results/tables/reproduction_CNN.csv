@@ -1,20 +1,20 @@
-family,model,input,classes,split,rep_acc,our_acc,diff,rep_time,our_fit,our_total,likely_cause,time_note
-CNN,V1,raw,3,dev,91.43,90.75,-0.68,225.0,39.35,40.67,,"fit only (reported time starts before data loading, Q5)"
-CNN,V1,raw,10,dev,89.34,88.77,-0.57,619.0,109.21,110.79,,"fit only (reported time starts before data loading, Q5)"
-CNN,V1,raw,50,dev,81.79,81.21,-0.58,2808.0,431.43,433.31,,"fit only (reported time starts before data loading, Q5)"
-CNN,V2,raw,3,dev,91.33,91.72,0.39,230.0,37.7,38.91,,"fit only (reported time starts before data loading, Q5)"
-CNN,V2,raw,10,dev,89.22,88.5,-0.72,622.0,99.14,100.47,,"fit only (reported time starts before data loading, Q5)"
-CNN,V2,raw,50,dev,81.83,75.13,-6.7,2808.0,372.88,374.98,Q1: the reported V2 was probably V1 (original cnn.py overwrote V2-V4 with V1); our V1 matches the reported V2,"fit only (reported time starts before data loading, Q5)"
-CNN,V2,raw,50,test,81.87,75.13,-6.74,,372.88,374.98,Q1: the reported V2 was probably V1 (original cnn.py overwrote V2-V4 with V1); our V1 matches the reported V2,"fit only (reported time starts before data loading, Q5)"
-CNN,V1,binarized,3,dev,89.02,89.57,0.55,220.0,43.66,45.09,,"fit only (reported time starts before data loading, Q5)"
-CNN,V1,binarized,10,dev,87.22,86.56,-0.66,590.0,109.33,111.4,,"fit only (reported time starts before data loading, Q5)"
-CNN,V1,binarized,50,dev,77.46,76.83,-0.63,2685.0,423.66,427.98,,"fit only (reported time starts before data loading, Q5)"
-CNN,V2,binarized,3,dev,89.12,90.07,0.95,215.0,38.53,39.89,,"fit only (reported time starts before data loading, Q5)"
-CNN,V2,binarized,10,dev,86.67,85.06,-1.61,585.0,100.02,101.88,,"fit only (reported time starts before data loading, Q5)"
-CNN,V2,binarized,50,dev,77.38,70.43,-6.95,2715.0,374.83,378.23,Q1: the reported V2 was probably V1 (original cnn.py overwrote V2-V4 with V1); our V1 matches the reported V2,"fit only (reported time starts before data loading, Q5)"
-CNN,V3,binarized,3,dev,88.2,88.75,0.55,186.0,37.47,38.75,,"fit only (reported time starts before data loading, Q5)"
-CNN,V3,binarized,10,dev,86.6,84.12,-2.48,560.0,91.7,93.74,"Not established: Q1 does not fit (reported V3 differs from reported V1); one seed, Keras 3 vs 2018 Keras, Q3 unscaled input","fit only (reported time starts before data loading, Q5)"
-CNN,V3,binarized,50,dev,70.3,65.14,-5.16,2455.0,319.7,323.23,"Not established: Q1 does not fit (reported V3 differs from reported V1); one seed, Keras 3 vs 2018 Keras, Q3 unscaled input","fit only (reported time starts before data loading, Q5)"
-CNN,V4,binarized,3,dev,89.1,89.2,0.1,239.0,36.9,38.23,,"fit only (reported time starts before data loading, Q5)"
-CNN,V4,binarized,10,dev,85.6,84.73,-0.87,628.0,86.62,88.21,,"fit only (reported time starts before data loading, Q5)"
-CNN,V4,binarized,50,dev,70.3,70.45,0.15,3043.0,361.36,364.71,,"fit only (reported time starts before data loading, Q5)"
+Model,Input,Classes,Reported accuracy (%),Our accuracy (%),Difference (points),Reported training time (s),Our training time (s),Explanation
+V1,raw,3,91.4,90.8,-0.7,225,39,Reproduced: within 1 point
+V2,raw,3,91.3,91.7,0.4,230,38,Reproduced: within 1 point
+V1,binarized,3,89.0,89.6,0.6,220,44,Reproduced: within 1 point
+V2,binarized,3,89.1,90.1,1.0,215,39,Reproduced: within 1 point
+V3,binarized,3,88.2,88.8,0.6,186,37,Reproduced: within 1 point
+V4,binarized,3,89.1,89.2,0.1,239,37,Reproduced: within 1 point
+V1,raw,10,89.3,88.8,-0.6,619,109,Reproduced: within 1 point
+V2,raw,10,89.2,88.5,-0.7,622,99,Reproduced: within 1 point
+V1,binarized,10,87.2,86.6,-0.7,590,109,Reproduced: within 1 point
+V2,binarized,10,86.7,85.1,-1.6,585,100,Reproduced: within 2 points
+V3,binarized,10,86.6,84.1,-2.5,560,92,Unexplained; likely seed or library-version differences
+V4,binarized,10,85.6,84.7,-0.9,628,87,Reproduced: within 1 point
+V1,raw,50,81.8,81.2,-0.6,2808,431,Reproduced: within 1 point
+V2,raw,50,81.8,75.1,-6.7,2808,373,The original code ran V1 under the V2 label (a bug in their script)
+V2 (test set),raw,50,81.9,75.1,-6.7,—,373,Test-set result. The original code ran V1 under the V2 label (a bug in their script). Reported training time: not given for the test set
+V1,binarized,50,77.5,76.8,-0.6,2685,424,Reproduced: within 1 point
+V2,binarized,50,77.4,70.4,-7.0,2715,375,The original code ran V1 under the V2 label (a bug in their script)
+V3,binarized,50,70.3,65.1,-5.2,2455,320,Unexplained; likely seed or library-version differences
+V4,binarized,50,70.3,70.5,0.2,3043,361,Reproduced: within 1 point

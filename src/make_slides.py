@@ -2,7 +2,7 @@
 
 Run: python src/make_slides.py
 Every number comes from results/tables/*.csv, read at build time and shown with one decimal (half-up).
-Images come from results/figures/phase9/. A missing figure becomes a marked [PLACEHOLDER ...] box and
+Images come from results/figures/. A missing figure becomes a marked [PLACEHOLDER ...] box and
 is listed when the script finishes; numbers that are not in results/ are marked [PLACEHOLDER ...] in the text.
 """
 import os
@@ -19,7 +19,7 @@ from pptx.util import Inches, Pt
 
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 TAB = os.path.join(ROOT, "results", "tables")
-FIG = os.path.join(ROOT, "results", "figures", "phase9")
+FIG = os.path.join(ROOT, "results", "figures")
 OUT = os.path.join(ROOT, "presentation", "ML_MiniProject.pptx")
 
 FONT = "Arial"
@@ -39,24 +39,55 @@ def f1(x):
     return f"{Decimal(repr(float(x))).quantize(Decimal('0.1'), rounding=ROUND_HALF_UP):,}"
 
 
-rep = pd.concat(pd.read_csv(os.path.join(TAB, f"reproduction_{f}.csv")) for f in ["LR", "SVM", "CNN", "TL"])
-svm = pd.read_csv(os.path.join(TAB, "svm_reported_20k_70k.csv"))
-cm = pd.read_csv(os.path.join(TAB, "cross_model_ours.csv"))
-xgb = pd.read_csv(os.path.join(TAB, "xgb_capped_vs_extended.csv"), dtype={"classes": str})
+# Model ids used below -> display names used in the tables.
+NAME = {"logreg": "Logistic regression", "linear": "Linear", "rbf": "RBF", "poly": "Polynomial", "sigmoid": "Sigmoid",
+        "vgg19": "VGG19", "mobilenet": "MobileNet", "resnet50": "ResNet50", "inception": "InceptionV3"}
+FAMILY = {"Logistic regression": "LR", "SVM": "SVM", "CNN": "CNN", "Transfer learning": "TL", "XGBoost": "XGB"}
+
+
+def _num(col):
+    return pd.to_numeric(col.replace("—", None))
+
+
+def _repro(fam):
+    d = pd.read_csv(os.path.join(TAB, f"reproduction_{fam}.csv"))
+    test = d.Model.str.endswith(" (test set)")
+    return pd.DataFrame({"family": fam, "model": d.Model.str.replace(" (test set)", "", regex=False),
+                         "input": d.Input, "classes": d.Classes, "split": test.map({True: "test", False: "dev"}),
+                         "rep_acc": d["Reported accuracy (%)"], "our_acc": d["Our accuracy (%)"],
+                         "diff": d["Difference (points)"]})
+
+
+def s0(x):
+    """Whole seconds, as in the tables."""
+    return f"{int(x):,}"
+
+
+rep = pd.concat(_repro(f) for f in ["LR", "SVM", "CNN", "TL"])
+_s = pd.read_csv(os.path.join(TAB, "svm_reported_20k_70k.csv"))
+svm = pd.DataFrame({"model": _s.Kernel, "classes": _s.Classes, "rep_acc": _s["Reported accuracy (%)"],
+                    "acc_20k": _s["Ours at 20k per class (%)"], "acc_70k": _s["Ours at 70k per class (%)"]})
+_c = pd.read_csv(os.path.join(TAB, "cross_model_ours.csv"))
+cm = pd.DataFrame({"family": _c["Model family"].map(FAMILY), "model": _c.Model, "input": _c.Input,
+                   "classes": _c.Classes, "dev_acc": _c["Validation accuracy (%)"], "time_s": _c["Training time (s)"]})
+xgb = pd.read_csv(os.path.join(TAB, "xgb_capped_vs_extended.csv"))
 
 
 def R(family, model, inp, k, split="dev"):
+    model = NAME.get(model, model)
     r = rep[(rep.family == family) & (rep.model == model) & (rep.input == inp) & (rep.classes == k) & (rep.split == split)]
     assert len(r) == 1, (family, model, inp, k)
     return r.iloc[0]
 
 
 def S(model, k):
-    return svm[(svm.model == model) & (svm.classes == k)].iloc[0]
+    return svm[(svm.model == NAME[model]) & (svm.classes == k)].iloc[0]
 
 
-def X(k, label):
-    return xgb[(xgb.classes == str(k)) & (xgb.label == label)].iloc[0]
+def X(k):
+    """(capped test, extended test) accuracy for k classes."""
+    r = xgb[xgb.Classes == k].iloc[0]
+    return r["Capped test (%)"], r["Extended test (%)"]
 
 
 def best(family, k):
@@ -199,7 +230,7 @@ def build():
         "3 / 10 / 50 classes, 20,000 drawings per class",
         "Split per class 80/10/10: 16,000 / 2,000 / 2,000 (train / validation / test)",
     ], 0.6, 1.8, 7.4, 5.0)
-    picture(s, "samples_10x5.png", 8.3, 1.2, 4.5, 5.7)
+    picture(s, "sample_drawings_10_classes.png", 8.3, 1.2, 4.5, 5.7)
     notes(s, "Our project reproduces and extends the report Drawing: A New Way To Search. The task is to classify "
              "hand-drawn doodles, and the authors' motivation is that a sketch could work as a search query. The data "
              "is Google QuickDraw: 28 by 28 grayscale bitmaps. Like the report, we use 3, 10 and 50 classes with "
@@ -287,7 +318,7 @@ def build():
     # 5. Reproduced results: transfer learning
     s = new()
     title(s, "Reproduced results: transfer learning (3 classes)")
-    picture(s, "tl_batchnorm.png", 0.6, 1.25, 7.4, 5.6)
+    picture(s, "transfer_learning_batchnorm.png", 0.6, 1.25, 7.4, 5.6)
     vgg, mob, res, inc = (R("TL", m, "resized", 3) for m in ["vgg19", "mobilenet", "resnet50", "inception"])
     bullets(s, [
         f"VGG19 (no BatchNorm) matches: {f1(vgg.our_acc)} vs {f1(vgg.rep_acc)} reported",
@@ -318,11 +349,11 @@ def build():
             arrow(s, 2.2, y + 0.57, 2.2, y + 0.83)
         y += 0.85
     text(s, "Each tree corrects the errors of the trees before it", 0.6, y + 0.05, 3.2, 1.0)
-    picture(s, "xgb50_capped_vs_converged_curve.png", 4.0, 1.25, 8.8, 3.35)
-    t = {k: (X(k, "xgb_capped").test_acc, X(k, "xgb_extended").test_acc) for k in (3, 10, 50)}
+    picture(s, "xgboost_50_classes_capped_vs_converged.png", 4.0, 1.25, 8.8, 3.35)
+    t = {k: X(k) for k in (3, 10, 50)}
     bullets(s, [
         "Why: the reference had no tree-based model, so a fourth model family",
-        # trial counts: DECISIONS.md Phase 8 (xgb_3 45, xgb_10 31, xgb_50 top 4) and Phase 8b (xgb10_wide 32)
+        # trial counts of the Optuna studies: 3 classes 45, 10 classes 31, 50 classes top 4; wider 10-class study 32
         "Optuna (TPE, Bayesian) on validation: 45 / 31 + 32 trials at 3 / 10 classes; top 4 settings on 50",
         "Phase 8 time-capped; 8B uncapped, wider search. Test % at 3 / 10 / 50: " +
         " / ".join(f1(a) for a, _ in t.values()) + " → " + " / ".join(f1(b) for _, b in t.values()),
@@ -337,7 +368,7 @@ def build():
     # 7. Comparison of all models
     s = new()
     title(s, "Comparison of all models (our runs, validation accuracy)")
-    picture(s, "accuracy_vs_time.png", 0.6, 1.1, 12.1, 3.85)
+    picture(s, "accuracy_vs_training_time.png", 0.6, 1.1, 12.1, 3.85)
     fams = [("LR", "LR"), ("SVM", "SVM"), ("CNN", "CNN"), ("TL", "TL"), ("XGB", "XGBoost")]
     name = {"logreg": "LR", "rbf": "RBF", "poly": "poly", "xgb": "Phase 8", "xgb_extended": "Phase 8B",
             "resnet50": "ResNet50", "vgg19": "VGG19", "mobilenet": "MobileNet", "inception": "InceptionV3"}
@@ -347,14 +378,14 @@ def build():
               for b in (best(fam, k) for k in (3, 10, 50)) if b is not None}
         head.append(f"{lab} ({ms.pop()})" if len(ms) == 1 and fam not in ("LR", "XGB") else
                     lab if fam in ("LR", "XGB") else f"{lab} (best)")
-    rows = [head] + [[str(k)] + ["—" if (b := best(fam, k)) is None else f"{f1(b.dev_acc)}% · {f1(b.time_s)} s"
+    rows = [head] + [[str(k)] + ["—" if (b := best(fam, k)) is None else f"{f1(b.dev_acc)}% · {s0(b.time_s)} s"
                                  for fam, _ in fams] for k in (3, 10, 50)]
     table(s, rows, 0.6, 5.05, [1.2, 1.9, 2.0, 2.0, 2.3, 2.7], row_h=0.42)
     c50, x50 = best("CNN", 50), best("XGB", 50)
     notes(s, "This chart puts every model on one accuracy against training-time plot, with a log time axis, one panel "
              f"per class size. The table gives the best model of each family. At 50 classes the CNN leads with "
-             f"{f1(c50.dev_acc)} percent in {f1(c50.time_s)} seconds, while tuned XGBoost reaches {f1(x50.dev_acc)} "
-             f"in {f1(x50.time_s)} seconds. Transfer learning is the most accurate at 3 classes. Logistic regression "
+             f"{f1(c50.dev_acc)} percent in {s0(c50.time_s)} seconds, while tuned XGBoost reaches {f1(x50.dev_acc)} "
+             f"in {s0(x50.time_s)} seconds. Transfer learning is the most accurate at 3 classes. Logistic regression "
              "is the fastest but falls off quickly as classes increase, and the SVMs sit between it and the CNNs.")
 
     # 8. Key findings
@@ -363,8 +394,8 @@ def build():
     c3, x3, c10, x10 = best("CNN", 3), best("XGB", 3), best("CNN", 10), best("XGB", 10)
     speed = x50.time_s / c50.time_s
     bullets(s, [
-        f"CNN is best on 50 classes: {f1(c50.dev_acc)}% in {f1(c50.time_s)} s, about {f1(speed)}× faster than "
-        f"tuned XGBoost ({f1(x50.dev_acc)}%, {f1(x50.time_s)} s)",
+        f"CNN is best on 50 classes: {f1(c50.dev_acc)}% in {s0(c50.time_s)} s, about {f1(speed)}× faster than "
+        f"tuned XGBoost ({f1(x50.dev_acc)}%, {s0(x50.time_s)} s)",
         f"XGBoost matches CNNs on 3 and 10 classes ({f1(x3.dev_acc)} vs {f1(c3.dev_acc)}; {f1(x10.dev_acc)} vs "
         f"{f1(c10.dev_acc)}) but plateaus at about 78% on 50: trees judge single pixels, CNNs learn shapes",
         "Three inconsistencies in the reference explained: the CNN version bug, the SVM data size, "

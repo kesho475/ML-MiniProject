@@ -4,7 +4,7 @@ Usage: python src/tl.py <vgg19|mobilenet|resnet50|inception> [--smoke]   (run tl
 Head: Dense(128, relu) -> Dense(3, softmax) on globally pooled features. Stage 1: Adam(clipnorm=1), batch 50.
 Inception stage 2: layers 249+ of the base (top 2 blocks) + head, trained on the saved `mixed8` features with
 SGD(lr=1e-4, momentum=0.9, clipnorm=1). Epochs: VGG19 20, MobileNet 100, ResNet50 100, Inception 50 + 50.
-Accuracy is dev accuracy (Q6); true test accuracy is also recorded. Times are head-only (feature extraction time
+Accuracy is dev accuracy (as in the reference); true test accuracy is also recorded. Times are head-only (feature extraction time
 is in params.extract_time_s), so they are NOT comparable with the report's full-network seconds per epoch.
 --smoke: reads data/features/smoke/, 2 epochs per stage, model name gets "-smoke".
 """

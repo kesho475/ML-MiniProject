@@ -58,7 +58,7 @@ def main(base, smoke=False):
                                             dtype=np.float16, shape=(len(x), 8, 8, 1280))
         parts, i = [], 0
         for b in resized_batches(x, size, BATCH):
-            o = extractor.predict_on_batch(b)  # inference mode: frozen base (Q7); compiled, so memory is freed early
+            o = extractor.predict_on_batch(b)  # inference mode: frozen base; compiled, so memory is freed early
             parts.append(o[0] if mix is not None else o)
             if mix is not None:
                 mix[i:i + len(b)] = o[1].astype(np.float16)

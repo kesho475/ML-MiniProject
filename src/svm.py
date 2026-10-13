@@ -1,8 +1,8 @@
 """Phase 6A: SVM (report Table 2). Usage: python src/svm.py <linear|poly|rbf|sigmoid> <k> [--smoke] [--70k]
 
-SVC with max_iter=500 (Q9: far from converged, kept on purpose); scaled input; dev accuracy only.
+SVC with max_iter=500 (far from converged, kept on purpose to match the reference); scaled input; dev accuracy only.
 --smoke: max_iter=5, run id gets a "-smoke" model name so it never counts as a real result.
---70k: first 70,000 drawings per class (Q4 check); family "svm70k" so it never replaces the main SVM rows.
+--70k: first 70,000 drawings per class (data-size check); family "svm70k" so it never replaces the main SVM rows.
 """
 import sys
 import warnings

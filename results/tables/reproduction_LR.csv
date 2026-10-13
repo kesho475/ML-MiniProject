@@ -1,4 +1,4 @@
-family,model,input,classes,split,rep_acc,our_acc,diff,rep_time,our_fit,our_total,likely_cause,time_note
-LR,logreg,raw,3,dev,79.51,79.27,-0.24,25.0,19.92,20.26,,fit only
-LR,logreg,raw,10,dev,64.64,65.79,1.15,122.0,20.02,20.46,,fit only
-LR,logreg,raw,50,dev,43.89,43.31,-0.58,1089.0,85.98,87.04,,fit only
+Model,Input,Classes,Reported accuracy (%),Our accuracy (%),Difference (points),Reported training time (s),Our training time (s),Explanation
+Logistic regression,raw,3,79.5,79.3,-0.2,25,20,Reproduced: within 1 point
+Logistic regression,raw,10,64.6,65.8,1.2,122,20,Reproduced: within 2 points
+Logistic regression,raw,50,43.9,43.3,-0.6,1089,86,Reproduced: within 1 point

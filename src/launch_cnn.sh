@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # CNN queue (GPU), one run at a time: all six 3-class configs, then 10, then 50 classes.
-# Collapse (exit 3, dev acc at chance after 5 epochs): retry with the next seed (up to 5 seeds), noted in DECISIONS.md.
+# Collapse (exit 3, dev acc at chance after 5 epochs): retry with the next seed (up to 5 seeds).
 # Any other crash only skips that run (see run_one.sh). Rerun to resume: finished runs are skipped.
 cd "$(dirname "$0")/.." || exit 1
 for k in 3 10 50; do

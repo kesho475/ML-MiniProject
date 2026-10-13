@@ -1,4 +1,4 @@
-"""Phase 8: XGBoost extension (D5) on the GPU, tuned with Optuna TPE on the dev set only.
+"""Phase 8: XGBoost extension on the GPU, tuned with Optuna TPE on the dev set only.
 
 Usage: python src/xgb.py <stage1|stage2|stage3> [--smoke]
   stage1: Optuna study on 10 classes, 2.5 h timeout
@@ -36,7 +36,7 @@ ROUNDS, PATIENCE = 3000, 50
 
 
 def space(trial):
-    """The search space (also listed in DECISIONS.md)."""
+    """The search space."""
     return {
         # Asked for 4-12; capped at 9 because deeper trees run out of the 8 GB GPU (50 classes).
         "max_depth": trial.suggest_int("max_depth", 4, 9),

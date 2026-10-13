@@ -49,7 +49,7 @@ PATIENCE = int(os.environ.get("XGBX_PATIENCE", PATIENCE))  # smoke tests only
 NEW_S, HARD_S = 11 * 3600, 11.5 * 3600  # from queue start; env XGBX_BUDGET="new,hard" overrides (smoke)
 GAIN = 0.003  # C runs only if wide's best dev beats Phase 8's 10-class best by >= 0.3 points
 FIXED = {"tree_method": "hist", "device": "cuda", "seed": 0, "objective": "multi:softprob"}
-# Wide search space (DECISIONS Phase 8b): name -> (low, high, log). max_depth <= 9: 8 GB GPU limit.
+# Wide search space: name -> (low, high, log). max_depth <= 9: 8 GB GPU limit.
 SPACE = {"max_depth": (6, 9, False), "learning_rate": (0.02, 0.3, True),
          "min_child_weight": (1, 50, True), "subsample": (0.6, 1.0, False),
          "colsample_bytree": (0.3, 1.0, False), "gamma": (0, 5, False), "reg_lambda": (1, 100, True)}
@@ -664,7 +664,7 @@ def _cont(r):
 
 
 def _append_records(p8, ext, rs, s, wb):
-    """Results part of DECISIONS.md Phase 8b and a PROGRESS.md line (append only)."""
+    """Append the results to the project notes (append only)."""
     lines = ["", f"### Phase 8b results (auto-appended by `src/xgb_ext.py final`, {datetime.now():%Y-%m-%d %H:%M})"]
     if s:
         lines.append(f"- `{WIDE}`: {len(s.trials)} trials {_states(s)}, search {s.user_attrs.get('search_wall_s', 0):.0f} s. "

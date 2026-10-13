@@ -49,7 +49,7 @@ def xgb():
 
 
 def svm70k():
-    """Reported SVM (Table 2) vs our 20k-per-class SVMs vs our 70k-per-class reruns (Q4 check)."""
+    """Reported SVM (Table 2) vs our 20k-per-class SVMs vs our 70k-per-class reruns (data-size check)."""
     t = table("SVM").drop(columns=["family", "split", "diff", "our_total"])
     t = t.rename(columns={"our_acc": "acc_20k", "our_fit": "fit_20k"})
     s = ours_only("svm70k").rename(columns={"dev_acc": "acc_70k", "fit_time_s": "fit_70k"})

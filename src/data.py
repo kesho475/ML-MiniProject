@@ -73,7 +73,7 @@ def load(k, variant="raw", n=N_PER_CLASS):
 def resized_batches(x_flat, size, batch=50):
     """Yield float32 (b, size, size, 3) batches from flat 784 rows; values stay 0-255.
 
-    Batch by batch only: all images at once would need tens of GB (PLAN Phase 3).
+    Batch by batch only: all images at once would need tens of GB.
     """
     import tensorflow as tf
     for i in range(0, len(x_flat), batch):
@@ -121,7 +121,7 @@ def _plot_samples():
 
 if __name__ == "__main__":
     import sys
-    if "--70k" in sys.argv:  # optional svm70k data (Q4 check), 3 and 10 classes only
+    if "--70k" in sys.argv:  # optional svm70k data (data-size check), 3 and 10 classes only
         for k in (3, 10):
             build(k, 70_000)
             _verify(k, 70_000)
