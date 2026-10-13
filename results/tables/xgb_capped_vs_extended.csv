@@ -1,0 +1,10 @@
+classes,label,dev_acc,test_acc,rounds,converged,best_fit_time_s,search_compute_s,note
+3,xgb_capped,91.65,90.8,1301,yes,56.76,1531.3,Phase 8 study xgb_3
+3,xgb_extended,91.65,90.8,1301,yes,56.76,0.0,unchanged from Phase 8 (all its trials converged)
+10,xgb_capped,89.76,89.69,1366,yes,345.29,9213.0,Phase 8 study xgb_10
+10,xgb_extended,89.84,89.79,2644,yes,485.8,10978.9,new: xgb10_wide trial 30
+50,xgb_capped,77.44,77.44,1168,no,4502.63,10203.7,Phase 8 study xgb_50
+50,xgb_extended,77.95,77.89,2193,yes,7191.1,30248.2,"run A1 (Phase 8 xgb_50 best (stage-1 trial 24), continued from the Phase 8 capped model)"
+all,xgb_capped,,,,,,20948.0,"total search compute, Phase 8"
+all,xgb_extended,,,,,,41227.1,"total extra compute, Phase 8b"
+all,both,,,,,,62175.1,Phase 8 + Phase 8b
