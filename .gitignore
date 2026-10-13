@@ -21,3 +21,4 @@ results/xgb_extended/
 results/optuna/
 results/figures/*/
 /33*.pdf
+.~lock.*#
