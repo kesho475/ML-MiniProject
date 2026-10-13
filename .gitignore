@@ -9,3 +9,9 @@ __pycache__/
 results/xgb_extended-smoke/
 graphify-out/
 .claude/
+PLAN.md
+DECISIONS.md
+logs/
+results/runs/
+results/xgb_phase8_backup/
+*smoke*
